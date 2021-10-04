@@ -186,13 +186,13 @@ export function AttendanceView() {
               {t('inputAttendance')}
             </Button>
           </div>
-          <p>
+          <div>
             <WeekPicker
               hasNext={dateSelected.day(6) < dayjs().day(0)}
               dateSelected={dateSelected}
               handleDateChange={handleDateChange}
             />
-          </p>
+          </div>
           <Table
             dataSource={attendanceData}
             columns={columns}
