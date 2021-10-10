@@ -46,9 +46,9 @@ module Wonderschool
         @child = Child.find_or_initialize_by(child_params)
         approval = existing_or_new_approval
         # idempotency - add only if it's not already associated
-        @child.approvals.include?(approval) || (@child.approvals << approval)
+        @child.cases.include?(approval) || (@child.case << approval)
         @child.save!
-        @child_approval = ChildApproval.find_by(child: @child, approval: approval)
+        @child_case = Childcase.find_by(child: @child, case: case)
       end
 
       def create_approval_amounts

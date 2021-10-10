@@ -48,6 +48,6 @@ end
 #
 # Foreign Keys
 #
-#  fk_rails_...  (approval_id => approvals.id)
+#  fk_rails_...  (approval_id => cases.id)
 #  fk_rails_...  (child_id => children.id)
 #

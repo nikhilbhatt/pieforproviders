@@ -16,11 +16,11 @@ task nebraska_dashboard_deploy: :environment do
         weekday: idx + 1,
         start_time: '9:00am',
         end_time: '5:00pm',
-        effective_on: child.approvals.order(effective_on: :asc).first.effective_on
+        effective_on: child.cases.order(effective_on: :asc).first.effective_on
       )
     end
     # generate prior absences
-    child.approvals.each do |approval|
+    child.cases.each do |approval|
       (approval.effective_on..([approval.expires_on, today].min)).each do |date|
         NebraskaAbsenceGenerator.new(child, date).call
       end

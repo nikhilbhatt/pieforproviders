@@ -10,23 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_03_055231) do
+ActiveRecord::Schema.define(version: 2021_10_10_182749) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
-
-  create_table "approvals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "case_number"
-    t.integer "copay_cents"
-    t.string "copay_currency", default: "USD", null: false
-    t.string "copay_frequency"
-    t.date "effective_on"
-    t.date "expires_on"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.date "deleted_at"
-  end
 
   create_table "attendances", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "check_in", null: false
@@ -65,6 +53,18 @@ ActiveRecord::Schema.define(version: 2021_10_03_055231) do
     t.date "deleted_at"
     t.index ["name", "user_id"], name: "index_businesses_on_name_and_user_id", unique: true
     t.index ["user_id"], name: "index_businesses_on_user_id"
+  end
+
+  create_table "cases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "case_number"
+    t.integer "copay_cents"
+    t.string "copay_currency", default: "USD", null: false
+    t.string "copay_frequency"
+    t.date "effective_on"
+    t.date "expires_on"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.date "deleted_at"
   end
 
   create_table "child_approvals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -254,7 +254,7 @@ ActiveRecord::Schema.define(version: 2021_10_03_055231) do
 
   add_foreign_key "attendances", "child_approvals"
   add_foreign_key "businesses", "users"
-  add_foreign_key "child_approvals", "approvals"
+  add_foreign_key "child_approvals", "cases", column: "approval_id"
   add_foreign_key "child_approvals", "children"
   add_foreign_key "children", "businesses"
   add_foreign_key "illinois_approval_amounts", "child_approvals"

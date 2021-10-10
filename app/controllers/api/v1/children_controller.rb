@@ -23,7 +23,7 @@ module Api
       def create
         authorize Business.find(child_params[:business_id]), :update? unless current_user.admin?
         @child = Child.new(child_params)
-        if @child.approvals.each(&:save) && @child.save
+        if @child.cases.each(&:save) && @child.save
           make_approval_amounts
           render json: @child, status: :created, location: @child
         else

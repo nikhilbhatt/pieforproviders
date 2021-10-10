@@ -11,7 +11,7 @@ class ChildBlueprint < Blueprinter::Base
 
   view :illinois_dashboard do
     field :case_number do |child, options|
-      child.approvals.active_on_date(options[:filter_date]).first&.case_number
+      child.cases.active_on_date(options[:filter_date]).first&.case_number
     end
     field :attendance_risk do |child, options|
       child.attendance_risk(options[:filter_date])
@@ -47,7 +47,7 @@ class ChildBlueprint < Blueprinter::Base
       # probably have "of 5" in their string, so we don't want it to duplicate
     end
     field :case_number do |child, options|
-      child.approvals.active_on_date(options[:filter_date]).first&.case_number
+      child.cases.active_on_date(options[:filter_date]).first&.case_number
     end
     field :family_fee do |child, options|
       format('%.2f', child.nebraska_family_fee(options[:filter_date]))&.to_f

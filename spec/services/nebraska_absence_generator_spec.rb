@@ -67,7 +67,7 @@ RSpec.describe NebraskaAbsenceGenerator, type: :service do
       end
 
       it 'does not create an absence if the child has no active child approval for this date' do
-        travel_to child.approvals.first.effective_on - 30.days
+        travel_to child.cases.first.effective_on - 30.days
         expect { described_class.new(child).call }.not_to change(Attendance, :count)
         travel_back
       end

@@ -73,10 +73,10 @@ RSpec.describe Child, type: :model do
     end
 
     it 'only displays children approved for the requested date in the approved_for_date scope' do
-      expect(described_class.approved_for_date(child.approvals.first.effective_on)).to include(child)
-      expect(described_class.approved_for_date(child.approvals.first.effective_on)).to include(inactive_child)
-      expect(described_class.approved_for_date(child.approvals.first.effective_on)).to include(deleted_child)
-      expect(described_class.approved_for_date(child.approvals.first.effective_on - 1.day)).to eq([])
+      expect(described_class.approved_for_date(child.cases.first.effective_on)).to include(child)
+      expect(described_class.approved_for_date(child.cases.first.effective_on)).to include(inactive_child)
+      expect(described_class.approved_for_date(child.cases.first.effective_on)).to include(deleted_child)
+      expect(described_class.approved_for_date(child.cases.first.effective_on - 1.day)).to eq([])
     end
 
     it 'displays inactive children but not deleted children in the not_deleted scope' do
@@ -134,7 +134,7 @@ RSpec.describe Child, type: :model do
         it 'returns the correct allocation of the family fee when there are two children' do
           # child object should have a default schedule, which is 40 hours a week, in whatever given month
           child_with_less_hours = create(:child,
-                                         approvals: [child.approvals.first],
+                                         approvals: [child.cases.first],
                                          schedules: [create(:schedule, weekday: 1)])
           expect(child.nebraska_family_fee(Time.current.to_date))
             .to eq(child.active_nebraska_approval_amount(Time.current.to_date).family_fee)
@@ -223,18 +223,18 @@ RSpec.describe Child, type: :model do
 
   describe 'approval methods' do
     it 'returns an active approval for a specific date' do
-      current_approval = child.approvals.first
+      current_approval = child.cases.first
       expect(child.active_approval(Time.current)).to eq(current_approval)
       expired_approval = create(:approval, effective_on: 3.years.ago, expires_on: 2.years.ago, create_children: false)
-      child.approvals << expired_approval
+      child.cases << expired_approval
       expect(child.active_approval(Time.current - 2.years - 6.months)).to eq(expired_approval)
     end
 
     it 'returns an active child_approval for a specific date' do
-      current_child_approval = child.approvals.first.child_approvals.where(child: child).first
+      current_child_approval = child.cases.first.child_approvals.where(child: child).first
       expect(child.active_child_approval(Time.current)).to eq(current_child_approval)
       expired_approval = create(:approval, effective_on: 3.years.ago, expires_on: 2.years.ago, create_children: false)
-      child.approvals << expired_approval
+      child.cases << expired_approval
       expired_child_approval = expired_approval.child_approvals.where(child: child).first
       expect(child.active_child_approval(Time.current - 2.years - 6.months)).to eq(expired_child_approval)
     end
@@ -242,9 +242,9 @@ RSpec.describe Child, type: :model do
 
   describe 'attendance methods' do
     it 'returns all attendances regardless of approval date' do
-      current_child_approval = child.approvals.first.child_approvals.where(child: child).first
+      current_child_approval = child.cases.first.child_approvals.where(child: child).first
       expired_approval = create(:approval, effective_on: 3.years.ago, expires_on: 2.years.ago, create_children: false)
-      child.approvals << expired_approval
+      child.cases << expired_approval
       expired_child_approval = expired_approval.child_approvals.where(child: child).first
       current_attendances = create_list(:attendance, 3, child_approval: current_child_approval)
       expired_attendances = create_list(:attendance, 3, child_approval: expired_child_approval)
@@ -271,7 +271,7 @@ RSpec.describe Child, type: :model do
              business_id: created_business.id,
              approvals_attributes: [attributes_for(:approval)])
     end
-    let!(:approval) { child.approvals.first }
+    let!(:approval) { child.cases.first }
 
     context 'when the child has the same approval as a previous child in our system' do
       let(:new_child_params) do
@@ -293,7 +293,7 @@ RSpec.describe Child, type: :model do
 
       it 'associates the approval' do
         new_child = described_class.create! new_child_params
-        expect(new_child.approvals.first.id).to eq(approval.id)
+        expect(new_child.cases.first.id).to eq(approval.id)
       end
 
       it 'creates a child' do
@@ -329,7 +329,7 @@ RSpec.describe Child, type: :model do
 
       it 'does not associate the approval' do
         new_child = described_class.create! new_child_params
-        expect(new_child.approvals.first.id).not_to eq(approval.id)
+        expect(new_child.cases.first.id).not_to eq(approval.id)
       end
 
       it 'creates a child' do

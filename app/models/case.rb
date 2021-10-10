@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # An approval from the state to provide subsidy funding to a family's childcare provider(s)
-class Approval < UuidApplicationRecord
+class Case < UuidApplicationRecord
   COPAY_FREQUENCIES = %w[daily weekly monthly].freeze
 
-  has_many :child_approvals, dependent: :destroy, inverse_of: :approval, autosave: true
+  has_many :child_approvals, dependent: :destroy, inverse_of: :case, autosave: true
   has_many :children, through: :child_approvals
   has_many :illinois_approval_amounts, through: :child_approvals
 
@@ -37,7 +37,7 @@ end
 
 # == Schema Information
 #
-# Table name: approvals
+# Table name: cases
 #
 #  id              :uuid             not null, primary key
 #  case_number     :string

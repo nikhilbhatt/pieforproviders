@@ -157,7 +157,7 @@ def create_case(full_name,
                                       wonderschool_id: business == @business_nebraska ? Faker::Name.wonderschool_id.to_i : nil,
                                       full_name: full_name,
                                       date_of_birth: date_of_birth)
-  child.approvals << approvals
+  child.cases << approvals
   child.save!
 
   if child.state == 'IL'
@@ -176,7 +176,7 @@ def create_case(full_name,
     total_days = rand(0..25).round
     total_hours = rand(0.0..10.0).round
 
-    child.approvals.each do |approval|
+    child.cases.each do |approval|
       special_needs_rate = Faker::Boolean.boolean
       ChildApproval.find_by(child: child, approval: approval).update!(
         full_days: rand(0..30),

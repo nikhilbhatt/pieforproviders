@@ -2,20 +2,20 @@
 
 # A child in care at businesses who need subsidy assistance
 class Child < UuidApplicationRecord
-  before_save :find_or_create_approvals
+  before_save :find_or_create_cases
   after_create_commit :create_default_schedule, unless: proc { |child| child.schedules.present? }
   after_save_commit :associate_rate, unless: proc { |child| child.active_previously_changed?(from: true, to: false) }
 
   belongs_to :business
 
   has_many :child_approvals, dependent: :destroy, inverse_of: :child, autosave: true
-  has_many :approvals, through: :child_approvals, dependent: :destroy
+  has_many :cases, through: :child_approvals, dependent: :destroy
   has_many :schedules, dependent: :delete_all
   has_many :nebraska_approval_amounts, through: :child_approvals, dependent: :destroy
 
   has_one :temporary_nebraska_dashboard_case, dependent: :destroy
 
-  validates :approvals, presence: true
+  validates :cases, presence: true
   validates :date_of_birth, date_param: true, presence: true
   validates :full_name, presence: true
   # This prevents this validation from running if other validations failed; if date_of_birth has thrown an error,
@@ -31,10 +31,10 @@ class Child < UuidApplicationRecord
   validates :inactive_reason, inclusion: { in: REASONS }, allow_nil: true
   validates :last_active_date, date_param: true, unless: proc { |child| child.last_active_date_before_type_cast.nil? }
 
-  accepts_nested_attributes_for :approvals, :child_approvals, :schedules
+  accepts_nested_attributes_for :cases, :child_approvals, :schedules
 
   scope :active, -> { where(active: true) }
-  scope :approved_for_date, ->(date) { joins(:approvals).merge(Approval.active_on_date(date)) }
+  scope :approved_for_date, ->(date) { joins(:cases).merge(Case.active_on_date(date)) }
   scope :not_deleted, -> { where(deleted_at: nil) }
   scope :nebraska, -> { joins(:business).where(business: { state: 'NE' }) }
 
@@ -57,11 +57,11 @@ class Child < UuidApplicationRecord
   end
 
   def active_approval(date)
-    approvals.active_on_date(date).first
+    cases.active_on_date(date).first
   end
 
   def active_child_approval(date)
-    active_approval(date)&.child_approvals&.find_by(child: self)
+    active_approval(date)&.child_cases&.find_by(child: self)
   end
 
   def attendances
@@ -329,12 +329,12 @@ class Child < UuidApplicationRecord
 
   private
 
-  def find_or_create_approvals
-    self.approvals = approvals.map do |approval|
-      Approval.find_or_create_by(
-        case_number: approval.case_number,
-        effective_on: approval.effective_on,
-        expires_on: approval.expires_on
+  def find_or_create_cases
+    self.cases = cases.map do |case1|
+      Case.find_or_create_by(
+        case_number: case1.case_number,
+        effective_on: case1.effective_on,
+        expires_on: case1.expires_on
       )
     end
   end

@@ -3,7 +3,7 @@
 # An individual child on a family's approval letter
 class ChildApproval < UuidApplicationRecord
   belongs_to :child
-  belongs_to :approval
+  belongs_to :case
   belongs_to :rate, polymorphic: true, optional: true
   has_many :illinois_approval_amounts, dependent: :destroy
   has_many :nebraska_approval_amounts, dependent: :destroy
@@ -11,10 +11,10 @@ class ChildApproval < UuidApplicationRecord
 
   delegate :user, to: :child
   delegate :business, to: :child
-  delegate :effective_on, to: :approval
-  delegate :expires_on, to: :approval
+  delegate :effective_on, to: :case
+  delegate :expires_on, to: :case
 
-  accepts_nested_attributes_for :nebraska_approval_amounts, :approval
+  accepts_nested_attributes_for :nebraska_approval_amounts, :case
 end
 
 # == Schema Information
@@ -33,7 +33,7 @@ end
 #  special_needs_rate        :boolean
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  approval_id               :uuid             not null
+#  case_id                   :uuid             not null
 #  child_id                  :uuid             not null
 #  rate_id                   :uuid
 #
@@ -45,6 +45,6 @@ end
 #
 # Foreign Keys
 #
-#  fk_rails_...  (approval_id => approvals.id)
+#  fk_rails_...  (approval_id => cases.id)
 #  fk_rails_...  (child_id => children.id)
 #
